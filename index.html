@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Paper Crawler - a spider that reads ML papers</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='18' r='9' fill='%230a0d10'/%3E%3Ccircle cx='9' cy='8' r='3' fill='%2319c3d6'/%3E%3Ccircle cx='23' cy='8' r='3' fill='%2319c3d6'/%3E%3Ccircle cx='16' cy='4' r='3' fill='%2319c3d6'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- Slim toolbar (top-left). All of it is also reachable by keyboard, see README. -->
+    <div id="toolbar" class="glass">
+      <span class="logo" title="Paper Crawler">/[•]\ <b>paper crawler</b></span>
+      <button id="btn-library" title="L - paper library">library</button>
+      <span class="seg" id="intensity" title="Markup intensity (1/2/3)">
+        <button data-i="calm">1 calm</button
+        ><button data-i="normal" class="on">2 normal</button
+        ><button data-i="wild">3 wild</button>
+      </span>
+      <button id="btn-pause" title="Space">⏸</button>
+      <button id="btn-follow" class="on" title="F - camera follow">
+        follow
+      </button>
+      <button id="btn-drop" title="D - drop the spider again">↧ drop</button>
+      <button id="btn-clear" title="C - clear markup">clear</button>
+      <button id="btn-title" title="T - caption overlay">T</button>
+      <button id="btn-help" title="? - keyboard shortcuts">?</button>
+    </div>
+
+    <!-- The paper lives in #paper. loader.js fills #paper-body; the header is ours. -->
+    <div id="stage">
+      <main id="paper">
+        <header id="paper-head">
+          <h1 id="paper-title">Loading…</h1>
+          <p id="paper-authors"></p>
+          <p id="paper-id"></p>
+        </header>
+        <div id="paper-body"></div>
+      </main>
+    </div>
+
+    <!-- Spider overlay: pointer-events:none so the paper stays clickable/selectable. -->
+    <canvas id="spider"></canvas>
+
+    <div id="title-overlay"></div>
+
+    <!-- AI explainer panel (analyst.js fills it) -->
+    <aside id="analyst" class="glass">
+      <header class="an-head">
+        <div class="an-crawl">
+          <span class="an-arrow">▸</span> crawling: <b id="an-sec">-</b>
+        </div>
+        <div class="seg" id="levels" title="Explanation level (B / S / R)">
+          <button data-l="beginner">B</button
+          ><button data-l="student" class="on">S</button
+          ><button data-l="researcher">R</button>
+        </div>
+      </header>
+      <nav class="an-tabs">
+        <button data-tab="live" class="on">Explainer</button>
+        <button data-tab="notes">
+          Crawler Notes <span id="note-count">0</span>
+        </button>
+      </nav>
+      <div id="an-banner" hidden></div>
+      <div id="tab-live" class="an-body"><div id="an-history"></div></div>
+      <div id="tab-notes" class="an-body" hidden><ul id="an-notes"></ul></div>
+      <footer class="an-foot">
+        <button id="exp-md" title="Download a Markdown paper breakdown">
+          ⬇ breakdown.md
+        </button>
+        <button id="exp-json" title="Download Crawler Notes as JSON">
+          ⬇ notes.json
+        </button>
+        <span id="an-status"></span>
+      </footer>
+    </aside>
+
+    <div id="toast" hidden></div>
+
+    <!-- Paper library: your papers, the table of contents, and "add a paper".
+         Opened with L (or the toolbar button). -->
+    <div id="library-backdrop" hidden></div>
+    <aside id="library" class="glass" hidden>
+      <header class="lib-head">
+        <span class="lib-title">library</span>
+        <button id="lib-close" title="L - close">✕</button>
+      </header>
+      <div class="lib-add">
+        <input
+          id="lib-arxiv"
+          type="text"
+          placeholder="arXiv id or URL - 1706.03762"
+          spellcheck="false"
+        />
+        <button id="lib-fetch" title="Download it from arXiv">add</button>
+      </div>
+      <div id="lib-progress" hidden></div>
+      <input id="lib-search" type="search" placeholder="search papers…" />
+      <div class="lib-scroll">
+        <ul id="lib-papers" class="lib-list"></ul>
+        <h4 class="lib-sub">this paper</h4>
+        <ul id="lib-outline" class="lib-list"></ul>
+      </div>
+      <footer class="lib-foot"><span id="lib-status"></span></footer>
+    </aside>
+
+    <!-- Keyboard shortcuts (? / Escape to close) -->
+    <div id="help" hidden>
+      <div class="help-card glass">
+        <h3>keyboard</h3>
+        <ul>
+          <li><kbd>L</kbd> library (papers + table of contents)</li>
+          <li><kbd>Space</kbd> pause / resume the spider</li>
+          <li><kbd>F</kbd> camera follow on / off</li>
+          <li><kbd>D</kbd> drop the spider again</li>
+          <li><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> markup intensity</li>
+          <li>
+            <kbd>B</kbd><kbd>S</kbd><kbd>R</kbd> explain at beginner / student /
+            researcher level
+          </li>
+          <li><kbd>E</kbd> explain the selected passage</li>
+          <li><kbd>C</kbd> clear the markup</li>
+          <li><kbd>T</kbd> title caption</li>
+          <li><kbd>?</kbd> this list</li>
+        </ul>
+        <button id="help-close">close</button>
+      </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
