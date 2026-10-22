@@ -1,0 +1,1185 @@
+/* ==========================================================================
+   Paper Crawler - style.css
+   1. tokens   2. page + paper theme   3. LaTeXML (arXiv HTML) bits
+   4. spider overlay + title caption   5. toolbar + AI panel
+   6. RESEARCH-MARKUP EFFECTS  (.m-*)  - toggled by crawler.js
+
+   Design rule for every markup class: it must NOT change layout.
+   (Highlights are painted with ::before bars + negative margins, "blow-ups"
+   use transform.) Words never reflow when the spider marks them, so feet that
+   are standing on words don't get yanked around and the page doesn't jitter.
+   ========================================================================== */
+
+/* ---------- 1. tokens ---------- */
+:root {
+  --teal: #19c3d6;
+  --red: #e0303a;
+  --orange: #ff7a3d;
+  --purple: #7b2cff;
+  --magenta: #ff2bd6;
+  --cyan: #25d7f0;
+  --green: #b9f3a4;
+  --panel-w: 372px;
+  --paper-w: 840px;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Inter, Roboto, sans-serif;
+  --serif:
+    "Latin Modern Roman", "CMU Serif", "Computer Modern", "STIX Two Text",
+    Georgia, "Times New Roman", serif;
+}
+
+/* ---------- 2. page + paper ---------- */
+html {
+  scroll-behavior: auto;
+}
+body {
+  margin: 0;
+  background: #17191e;
+  color: #000;
+  font-family: var(--sans);
+}
+
+#stage {
+  padding: 72px 24px 240px;
+  margin-right: var(--panel-w);
+}
+
+#paper {
+  /* isolate => this is the stacking context the ::before highlight bars sit in
+     (z-index:-1 puts them above the white page but behind every word). */
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+  max-width: var(--paper-w);
+  margin: 0 auto;
+  padding: 56px 76px 96px;
+  background: #fff;
+  color: #000;
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.55;
+  box-shadow: 0 12px 70px rgba(0, 0, 0, 0.55);
+  text-align: left;
+  hyphens: manual;
+}
+#paper-head {
+  text-align: center;
+  margin-bottom: 1.6em;
+}
+#paper-title {
+  font-size: 1.85em;
+  line-height: 1.2;
+  margin: 0 0 0.5em;
+  font-weight: 700;
+}
+#paper-authors {
+  margin: 0 0 0.3em;
+  font-size: 1.02em;
+}
+#paper-id {
+  margin: 0;
+  font: 13px var(--mono);
+  color: #555;
+}
+#paper-body > .ltx_document,
+#paper-body article {
+  margin: 0;
+}
+#paper a {
+  color: #0b5cad;
+  text-decoration: none;
+}
+#paper a:hover {
+  text-decoration: underline;
+}
+#paper img {
+  max-width: 100%;
+  height: auto;
+}
+
+.empty-state {
+  font: 15px/1.6 var(--sans);
+  color: #333;
+  padding: 2em 0;
+}
+.empty-state code {
+  background: #eee;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* ---------- 3. arXiv "LaTeXML" markup ---------- */
+.ltx_title_document,
+.ltx_authors,
+.ltx_dates,
+.ltx_page_logo,
+.ltx_ERROR,
+.ltx_note_outer {
+  display: none;
+}
+.ltx_title {
+  font-weight: 700;
+  line-height: 1.25;
+}
+.ltx_title_section {
+  font-size: 1.4em;
+  margin: 1.7em 0 0.55em;
+}
+.ltx_title_subsection {
+  font-size: 1.15em;
+  margin: 1.4em 0 0.45em;
+}
+.ltx_title_subsubsection,
+.ltx_title_paragraph {
+  font-size: 1em;
+  margin: 1.1em 0 0.3em;
+}
+.ltx_title_paragraph {
+  display: inline;
+  font-style: italic;
+}
+.ltx_title_abstract {
+  text-align: center;
+  font-size: 1.05em;
+  margin: 1.2em 0 0.4em;
+}
+.ltx_tag_section,
+.ltx_tag_subsection,
+.ltx_tag_subsubsection,
+.ltx_tag_appendix {
+  margin-right: 0.6em;
+}
+.ltx_abstract {
+  margin: 0 2.2em 1.4em;
+  font-size: 0.95em;
+}
+.ltx_para {
+  margin: 0;
+}
+.ltx_p {
+  margin: 0 0 0.75em;
+  text-align: justify;
+}
+.ltx_font_bold {
+  font-weight: 700;
+}
+.ltx_font_italic {
+  font-style: italic;
+}
+.ltx_font_smallcaps {
+  font-variant: small-caps;
+}
+.ltx_font_typewriter {
+  font-family: var(--mono);
+  font-size: 0.9em;
+}
+.ltx_font_sansserif {
+  font-family: var(--sans);
+}
+.ltx_note_mark,
+.ltx_ref_tag + sup {
+  font-size: 0.7em;
+  vertical-align: super;
+}
+cite {
+  font-style: normal;
+}
+math {
+  font-size: 1.04em;
+}
+math[display="block"] {
+  display: block math;
+  margin: 0.5em 0;
+}
+
+.ltx_figure,
+.ltx_table {
+  margin: 1.4em 0;
+  text-align: center;
+}
+.ltx_caption {
+  font-size: 0.92em;
+  text-align: left;
+  margin: 0.5em 0;
+}
+.ltx_tag_figure,
+.ltx_tag_table {
+  font-weight: 700;
+}
+.ltx_table .ltx_caption {
+  text-align: center;
+}
+.ltx_tabular,
+table.ltx_tabular {
+  border-collapse: collapse;
+  margin: 0.8em auto;
+  font-size: 0.9em;
+}
+.ltx_tabular td,
+.ltx_tabular th {
+  padding: 0.25em 0.7em;
+  vertical-align: baseline;
+}
+.ltx_align_left {
+  text-align: left;
+}
+.ltx_align_right {
+  text-align: right;
+}
+.ltx_align_center {
+  text-align: center;
+}
+.ltx_border_t {
+  border-top: 1px solid #000;
+}
+.ltx_border_b {
+  border-bottom: 1px solid #000;
+}
+.ltx_border_l {
+  border-left: 1px solid #000;
+}
+.ltx_border_r {
+  border-right: 1px solid #000;
+}
+.ltx_border_tt {
+  border-top: 2px solid #000;
+}
+.ltx_border_bb {
+  border-bottom: 2px solid #000;
+}
+.ltx_transformed_outer,
+.ltx_transformed_inner {
+  max-width: 100%;
+}
+table.ltx_equation,
+table.ltx_eqn_table,
+.ltx_equationgroup {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.4em 0;
+}
+.ltx_eqn_cell {
+  padding: 0.3em 0;
+  text-align: center;
+}
+.ltx_eqn_eqno {
+  text-align: right;
+  width: 3.4em;
+}
+.ltx_listing,
+pre {
+  font: 0.8em/1.4 var(--mono);
+  overflow-x: auto;
+  background: #f6f6f6;
+  padding: 0.6em 0.8em;
+}
+ul.ltx_itemize,
+ol.ltx_enumerate {
+  margin: 0.4em 0 0.8em;
+  padding-left: 1.6em;
+}
+.ltx_biblist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.88em;
+}
+.ltx_bibitem {
+  margin: 0.35em 0;
+  padding-left: 2.2em;
+  text-indent: -2.2em;
+}
+.ltx_bibblock {
+  display: inline;
+}
+
+/* ---------- 4. spider overlay + TikTok-style caption ---------- */
+#spider {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 40;
+}
+
+#title-overlay {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 46%;
+  transform: translateY(-50%);
+  z-index: 70;
+  pointer-events: none;
+  text-align: center;
+  padding: 0 calc(var(--panel-w) * 0.5) 0 6%;
+  font:
+    900 clamp(34px, 5.6vw, 92px)/1.04 Impact,
+    "Arial Black",
+    "Helvetica Neue",
+    var(--sans);
+  color: #fff;
+  letter-spacing: 0.01em;
+  -webkit-text-stroke: 0.17em #000;
+  paint-order: stroke fill;
+  text-shadow: 0 0.06em 0.1em rgba(0, 0, 0, 0.35);
+}
+#title-overlay.on {
+  display: block;
+}
+@supports not (paint-order: stroke fill) {
+  #title-overlay {
+    -webkit-text-stroke: 0;
+    text-shadow:
+      -0.06em -0.06em 0 #000,
+      0.06em -0.06em 0 #000,
+      -0.06em 0.06em 0 #000,
+      0.06em 0.06em 0 #000,
+      0 -0.08em 0 #000,
+      0 0.08em 0 #000,
+      -0.08em 0 0 #000,
+      0.08em 0 0 #000;
+  }
+}
+
+/* ---------- 5. toolbar + AI panel ---------- */
+/* "Dark glass" WITHOUT backdrop-filter: a live blur would be re-rendered every frame (the spider canvas
+   changes underneath it) and cost ~half our frame rate on software/low-end GPUs. Translucency + a gradient
+   + a hairline border gives the same look for free. */
+.glass {
+  background: linear-gradient(
+    180deg,
+    rgba(22, 27, 34, 0.9),
+    rgba(10, 12, 16, 0.93)
+  );
+  color: #d5e2ea;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  font: 12px/1.4 var(--mono);
+}
+#toolbar {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  max-width: calc(100vw - var(--panel-w) - 36px);
+  flex-wrap: wrap;
+}
+#toolbar .logo {
+  color: var(--teal);
+  white-space: nowrap;
+  margin-right: 4px;
+}
+#toolbar .logo b {
+  color: #fff;
+  font-weight: 600;
+}
+.glass button,
+.glass select {
+  font: inherit;
+  color: #c3d3dc;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.glass button:hover,
+.glass select:hover {
+  background: rgba(255, 255, 255, 0.13);
+}
+.glass button.on {
+  background: rgba(25, 195, 214, 0.22);
+  border-color: rgba(25, 195, 214, 0.6);
+  color: #fff;
+}
+.glass select {
+  max-width: 220px;
+}
+.glass select option {
+  background: #14171c;
+}
+.seg {
+  display: inline-flex;
+  gap: 0;
+}
+.seg button {
+  border-radius: 0;
+  margin-left: -1px;
+}
+.seg button:first-child {
+  border-radius: 7px 0 0 7px;
+  margin-left: 0;
+}
+.seg button:last-child {
+  border-radius: 0 7px 7px 0;
+}
+
+#analyst {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  bottom: 12px;
+  width: calc(var(--panel-w) - 24px);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  overflow: hidden;
+}
+.an-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 11px 12px 9px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.an-crawl {
+  color: #8fa3ad;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.an-crawl b {
+  color: #fff;
+  font-weight: 600;
+}
+.an-arrow {
+  color: var(--teal);
+}
+.an-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 7px 10px 0;
+}
+.an-tabs button {
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  padding: 4px 8px;
+  color: #8fa3ad;
+}
+.an-tabs button.on {
+  color: #fff;
+  border-bottom-color: var(--teal);
+  background: none;
+}
+#note-count {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9px;
+  padding: 0 6px;
+  margin-left: 3px;
+}
+.an-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 12px 14px;
+  scrollbar-width: thin;
+  scrollbar-color: #3a4650 transparent;
+}
+.an-body[hidden],
+#an-banner[hidden] {
+  display: none;
+}
+#an-banner {
+  margin: 10px 12px 0;
+  padding: 9px 11px;
+  border-radius: 9px;
+  background: rgba(255, 122, 61, 0.13);
+  border: 1px solid rgba(255, 122, 61, 0.45);
+  color: #ffc9ad;
+  font: 12px/1.5 var(--sans);
+}
+#an-banner code {
+  font-family: var(--mono);
+  background: rgba(0, 0, 0, 0.35);
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: #fff;
+}
+
+.card {
+  margin: 12px 0;
+  padding: 9px 11px 10px;
+  border-left: 2px solid var(--teal);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 0 9px 9px 0;
+}
+.card.sel {
+  border-left-color: var(--orange);
+}
+.card.tldr {
+  border-left-color: var(--purple);
+}
+.card h4 {
+  margin: 0 0 5px;
+  font: 600 11px var(--mono);
+  color: #7fd6e2;
+  letter-spacing: 0.02em;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+.card.sel h4 {
+  color: #ffb48f;
+}
+.card.tldr h4 {
+  color: #b999ff;
+}
+.card h4 .tag {
+  margin-left: auto;
+  font-weight: 400;
+  color: #78909b;
+}
+.card .quote {
+  font: italic 12px/1.4 var(--sans);
+  color: #8ea2ac;
+  margin: 0 0 6px;
+  border-left: 2px solid #3a4650;
+  padding-left: 7px;
+}
+.card .txt {
+  font: 14px/1.55 var(--sans);
+  color: #e8f1f6;
+  white-space: pre-wrap;
+}
+.card .txt b {
+  color: #fff;
+}
+.card .txt code {
+  font-family: var(--mono);
+  font-size: 0.9em;
+  background: rgba(255, 255, 255, 0.09);
+  padding: 0 4px;
+  border-radius: 4px;
+}
+.card.typing .txt::after {
+  content: "▍";
+  color: var(--teal);
+  animation: blink 1s steps(2) infinite;
+}
+.card .key {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font: 12px var(--mono);
+  color: #ffd9c4;
+  background: rgba(255, 122, 61, 0.18);
+  border: 1px solid rgba(255, 122, 61, 0.5);
+  cursor: pointer;
+}
+.card .key::before {
+  content: "KEY ";
+  color: var(--orange);
+  font-weight: 700;
+}
+.card .err {
+  color: #ff9aa0;
+  font: 12px/1.5 var(--sans);
+}
+.card .retry {
+  margin-top: 6px;
+  color: #ffb48f;
+  font: 11px/1.4 var(--mono);
+  border-left: 2px solid rgba(255, 122, 61, 0.5);
+  padding-left: 7px;
+}
+.card .wait {
+  color: #6f848e;
+  font: 12px var(--mono);
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+#an-notes {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+#an-notes li {
+  margin: 0 0 9px;
+  padding: 7px 9px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  font: 12px/1.45 var(--sans);
+}
+#an-notes .chip {
+  font: 700 10px var(--mono);
+  padding: 1px 6px;
+  border-radius: 5px;
+  margin-right: 6px;
+  text-transform: uppercase;
+}
+.chip.metric {
+  background: rgba(255, 122, 61, 0.25);
+  color: #ffb48f;
+}
+.chip.model {
+  background: rgba(255, 43, 214, 0.22);
+  color: #ff9cec;
+}
+.chip.dataset {
+  background: rgba(25, 195, 214, 0.22);
+  color: #8fe6f0;
+}
+#an-notes .nt {
+  font-weight: 600;
+  color: #fff;
+}
+#an-notes .ns {
+  color: #7f95a0;
+  font: 11px var(--mono);
+}
+#an-notes .nx {
+  color: #a9bbc4;
+  margin-top: 3px;
+}
+.an-empty {
+  color: #6f848e;
+  font: 12px/1.5 var(--sans);
+  padding: 10px 0;
+}
+
+.an-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+#an-status {
+  margin-left: auto;
+  color: #6f848e;
+  font-size: 11px;
+}
+
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  z-index: 80;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: rgba(13, 15, 19, 0.9);
+  color: #fff;
+  font: 13px var(--sans);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+#toast[hidden] {
+  display: none;
+}
+
+/* ---------- 5b. paper library drawer + keyboard help ---------- */
+#library-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 72;
+  background: rgba(5, 7, 10, 0.55);
+}
+#library-backdrop[hidden],
+#library[hidden],
+#help[hidden] {
+  display: none;
+}
+#library {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  bottom: 12px;
+  width: 330px;
+  z-index: 76;
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  overflow: hidden;
+}
+/* the drawer covers the toolbar, so move the toolbar out of its way */
+body.lib-open #toolbar {
+  left: 354px;
+}
+.lib-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.lib-title {
+  color: var(--teal);
+  letter-spacing: 0.08em;
+}
+.lib-add {
+  display: flex;
+  gap: 6px;
+  padding: 10px 12px 8px;
+}
+.lib-add input,
+#lib-search {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  color: #dbe7ee;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 7px;
+  padding: 5px 8px;
+}
+.lib-add input:focus,
+#lib-search:focus {
+  outline: 1px solid var(--teal);
+  border-color: var(--teal);
+}
+#lib-search {
+  margin: 0 12px 4px;
+}
+#lib-progress {
+  margin: 4px 12px 0;
+  padding: 7px 9px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #9fb3bd;
+  max-height: 130px;
+  overflow-y: auto;
+}
+#lib-progress .lib-log.ok {
+  color: #9df0b0;
+}
+#lib-progress .lib-log.err {
+  color: #ffb0a6;
+  white-space: pre-line;
+}
+.lib-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 8px 14px;
+  scrollbar-width: thin;
+  scrollbar-color: #3a4650 transparent;
+}
+.lib-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.lib-paper {
+  padding: 7px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.lib-paper:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.lib-paper.on {
+  background: rgba(25, 195, 214, 0.14);
+  border-color: rgba(25, 195, 214, 0.5);
+}
+.lib-paper b {
+  display: block;
+  color: #fff;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.lib-paper span {
+  display: block;
+  color: #8fa3ad;
+  font-size: 11px;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lib-sub {
+  margin: 16px 0 6px 8px;
+  color: #7fd6e2;
+  font: 600 11px var(--mono);
+  letter-spacing: 0.04em;
+}
+.lib-sec {
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #c3d3dc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lib-sec:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+}
+.lib-sec.lv2 {
+  padding-left: 20px;
+}
+.lib-sec.lv3 {
+  padding-left: 32px;
+}
+.lib-empty {
+  color: #6d7d88;
+  padding: 6px 8px;
+}
+.lib-foot {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 7px 12px;
+  color: #8fa3ad;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* keyboard help */
+#help {
+  position: fixed;
+  inset: 0;
+  z-index: 78;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 7, 10, 0.6);
+}
+.help-card {
+  width: min(420px, 92vw);
+  padding: 18px 20px 16px;
+  border-radius: 14px;
+}
+.help-card h3 {
+  margin: 0 0 10px;
+  color: var(--teal);
+  font: 600 13px var(--mono);
+  letter-spacing: 0.08em;
+}
+.help-card ul {
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+.help-card li {
+  padding: 3px 0;
+  color: #c3d3dc;
+}
+.help-card kbd {
+  display: inline-block;
+  min-width: 18px;
+  text-align: center;
+  margin-right: 6px;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  font: 11px var(--mono);
+  color: #fff;
+}
+
+@media (max-width: 1100px) {
+  #stage {
+    margin-right: 0;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  #paper {
+    padding: 36px 28px 70px;
+  }
+  #analyst {
+    width: min(340px, calc(100vw - 24px));
+    top: auto;
+    height: 46vh;
+  }
+  #toolbar {
+    max-width: calc(100vw - 24px);
+  }
+}
+
+/* ---------- 5c. reduced motion: the spider still crawls, the page stops bouncing ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .card.typing .txt::after {
+    animation: none;
+  }
+  .m-hl,
+  .m-blowup,
+  .m-key,
+  .m-phrase {
+    animation: none !important;
+  }
+  .m-blowup {
+    transform: scale(1.3) rotate(-1.2deg);
+  }
+}
+
+/* ---------- 6. RESEARCH-MARKUP EFFECTS ----------
+   Toggled by crawler.js on <span class="w"> words (and on .m-phrase wrappers).
+   Bars (.m-hl-*): painted by ::before at z-index:-1 so text stays on top. */
+
+.m-hl-orange,
+.m-hl-purple,
+.m-hl-magenta,
+.m-hl-cyan,
+.m-hl-green {
+  position: relative;
+}
+.m-hl-orange::before,
+.m-hl-purple::before,
+.m-hl-magenta::before,
+.m-hl-cyan::before,
+.m-hl-green::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: -0.2em;
+  right: -0.2em;
+  top: 0.06em;
+  bottom: -0.14em;
+  background: var(--bar);
+  border-radius: 2px;
+  transform-origin: left center;
+  animation: bar-in 0.26s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+@keyframes bar-in {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* solid orange bar, dark bold text (fake-bold via stroke so widths don't change) */
+.m-hl-orange {
+  --bar: var(--orange);
+  color: #1b1209;
+  -webkit-text-stroke: 0.55px #1b1209;
+}
+/* "promoted" to a big standalone line */
+.m-hl-orange.m-big {
+  display: inline-block;
+  transform: scale(1.9) rotate(-1.2deg);
+  transform-origin: left center;
+  z-index: 3;
+  animation: pop-big 0.4s cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+@keyframes pop-big {
+  from {
+    transform: scale(1) rotate(0);
+  }
+  to {
+    transform: scale(1.9) rotate(-1.2deg);
+  }
+}
+
+/* section headings: purple bar + white monospace */
+.m-hl-purple {
+  --bar: var(--purple);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 0.92em;
+  -webkit-text-stroke: 0;
+}
+.m-hl-purple::before {
+  left: -0.28em;
+  right: -0.28em;
+}
+
+.m-hl-magenta {
+  --bar: var(--magenta);
+  color: #fff;
+}
+.m-hl-magenta.m-wide::before {
+  left: -0.9em;
+  right: -0.9em;
+} /* stretched wider than the word */
+
+/* full-row cyan: every word of a line gets it, bars overlap by .16em so they read as one strip */
+.m-hl-cyan {
+  --bar: var(--cyan);
+  color: #04222a;
+}
+.m-hl-cyan::before {
+  left: -0.16em;
+  right: -0.16em;
+  top: 0;
+  bottom: -0.18em;
+}
+
+.m-hl-green {
+  --bar: var(--green);
+}
+.m-hl-green::before {
+  transform: skewX(-6deg);
+  animation-name: bar-in-skew;
+}
+@keyframes bar-in-skew {
+  from {
+    transform: skewX(-6deg) scaleX(0);
+  }
+  to {
+    transform: skewX(-6deg) scaleX(1);
+  }
+}
+
+/* thin outlines */
+.m-box-teal {
+  --bx: #19c3d6;
+}
+.m-box-purple {
+  --bx: #7b2cff;
+}
+.m-box-orange {
+  --bx: #ff7a3d;
+}
+.m-box-red {
+  --bx: #e0303a;
+}
+.m-box-green {
+  --bx: #25b45a;
+}
+.w[class*="m-box-"],
+.m-phrase[class*="m-box-"] {
+  outline: 1.5px solid var(--bx);
+  outline-offset: 1.5px;
+  border-radius: 2px;
+}
+
+/* numbers enlarged 2-3x (transform => no reflow) */
+.m-blowup {
+  --sc: 2.4;
+  display: inline-block;
+  position: relative;
+  z-index: 4;
+  font-weight: 700;
+  color: var(--orange);
+  transform: scale(var(--sc));
+  transform-origin: 50% 72%;
+  animation: pop 0.5s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.m-blowup.m-s2 {
+  --sc: 2;
+}
+.m-blowup.m-s3 {
+  --sc: 3;
+}
+.m-blowup.m-red {
+  color: var(--red);
+}
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  55% {
+    transform: scale(calc(var(--sc) * 1.25));
+  }
+  100% {
+    transform: scale(var(--sc));
+  }
+}
+
+/* a phrase rotated ~-70deg, sticking out of the text */
+.m-rotate-green {
+  display: inline-block;
+  position: relative;
+  z-index: 3;
+  transform: rotate(-70deg);
+  transform-origin: 0 100%;
+  color: #0b6b2e;
+  font-weight: 700;
+  background: #c4f7cf;
+  padding: 0 0.3em;
+  border-radius: 3px;
+  white-space: nowrap;
+  animation: rot 0.5s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+@keyframes rot {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(-70deg);
+  }
+}
+
+/* recolour in place */
+.m-color-text {
+  color: var(--tc, #d6336c);
+  font-weight: 700;
+}
+.m-color-text.m-c1 {
+  --tc: #0a8ea0;
+}
+.m-color-text.m-c2 {
+  --tc: #7b2cff;
+}
+.m-color-text.m-c3 {
+  --tc: #e8590c;
+}
+.m-color-text.m-c4 {
+  --tc: #e0303a;
+}
+.m-color-text.m-c5 {
+  --tc: #2b8a3e;
+}
+
+/* wrapper made by JS around 2-6 consecutive words (rotate phrases, AI "KEY" phrases) */
+.m-phrase {
+  display: inline-block;
+  position: relative;
+  white-space: normal;
+}
+.m-phrase.m-rotate-green {
+  white-space: nowrap;
+}
+.m-key {
+  z-index: 6;
+  transform: scale(1.65);
+  transform-origin: left center;
+  color: var(--orange);
+  font-weight: 800;
+  background: #fff6ef;
+  padding: 0 0.25em;
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+  border-radius: 3px;
+  animation: pop-key 0.55s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+@keyframes pop-key {
+  from {
+    transform: scale(1);
+  }
+  55% {
+    transform: scale(2);
+  }
+  to {
+    transform: scale(1.65);
+  }
+}
+/* long KEY phrases: each word gets the orange bar + red outline instead */
+.m-keyrun {
+  outline: 1.5px solid var(--red);
+  outline-offset: 1px;
+}
+
+/* ---------- debug HUD (?debug) ---------- */
+#fps {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  z-index: 90;
+  font: 12px var(--mono);
+  color: #0f0;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 3px 7px;
+  border-radius: 5px;
+}
